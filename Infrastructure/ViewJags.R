@@ -138,21 +138,23 @@ shinyObject <- function (title = "Sin nombre"){
                   plotlyOutput("bernoulliGraphic")
                 )
         ),
+        
         tabItem(tabName = "cauchyContent", 
                 fluidRow(
                   # A static infoBox
-                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  infoBox("Tipo", "Continua", icon = icon("chain"), color="purple"),
                   # Dynamic infoBoxes
                   infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
                 ),
                 fluidRow(
                   box(
-                    numericInput("binomialLocation", "Ubicación", 0),
-                    numericInput("binomialScale", "Escala", 1)
+                    numericInput("cauchyLocation", "Ubicación", 0),
+                    numericInput("cauchyScale", "Escala", 1),
+                    actionButton("cauchyLoad", "Cargar")
                   ),
                   box(
-                    numericInput("cauchyMin", "Mínimo", 0),
-                    numericInput("Max", "Máximo", 1)
+                    numericInput("cauchyMin", "Mínimo", -4),
+                    numericInput("cauchyMax", "Máximo", 4)
                   )
                 ),
                 fluidRow(
@@ -337,6 +339,31 @@ shinyObject <- function (title = "Sin nombre"){
     })
     
     
+    output$cauchyGraphic <-renderPlotly({
+      
+      input$cauchyLoad
+      
+      tempCauchyLocation <- isolate(input$cauchyLocation)
+      tempCauchyScale <- isolate(input$cauchyScale)
+      tempCauchyMin <- isolate(input$cauchyMin)
+      tempCauchyMax <- isolate(input$cauchyMax)
+      
+      cat("tempCauchyLocation ", tempCauchyLocation, " \n")
+      cat("tempCauchyScale ", tempCauchyScale, " \n")
+      cat("tempCauchyMin ", tempCauchyMin, " \n")
+      cat("tempCauchyMax ", tempCauchyMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempCauchyMin, tempCauchyMax)), aes(x)) + 
+        stat_function(fun = dcauchy, args = list(location = tempCauchyLocation, scale = tempCauchyScale))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
     
     
   }
