@@ -161,6 +161,30 @@ shinyObject <- function (title = "Sin nombre"){
                   plotlyOutput("cauchyGraphic")
                 )
         ),
+        
+        tabItem(tabName = "weibullContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Continua", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("weibullShape", "Forma", 1),
+                    numericInput("weibullScale", "Escala", 3.1416),
+                    actionButton("weibullLoad", "Cargar")
+                  ),
+                  box(
+                    numericInput("weibullMin", "Mínimo", -4),
+                    numericInput("weibullMax", "Máximo", 4)
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("weibullGraphic")
+                )
+        ),
+        
         tabItem(tabName = "binomialContent", 
                 fluidRow(
                   # A static infoBox
@@ -309,6 +333,58 @@ shinyObject <- function (title = "Sin nombre"){
       
       gg <- ggplotly(tempPlot)
       
+      return (gg)
+    })
+    
+    output$cauchyGraphic <-renderPlotly({
+      
+      input$cauchyLoad
+      
+      tempCauchyLocation <- isolate(input$cauchyLocation)
+      tempCauchyScale <- isolate(input$cauchyScale)
+      tempCauchyMin <- isolate(input$cauchyMin)
+      tempCauchyMax <- isolate(input$cauchyMax)
+      
+      cat("tempCauchyLocation ", tempCauchyLocation, " \n")
+      cat("tempCauchyScale ", tempCauchyScale, " \n")
+      cat("tempCauchyMin ", tempCauchyMin, " \n")
+      cat("tempCauchyMax ", tempCauchyMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempCauchyMin, tempCauchyMax)), aes(x)) + 
+        stat_function(fun = dcauchy, args = list(location = tempCauchyLocation, scale = tempCauchyScale))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+    
+    output$weibullGraphic <-renderPlotly({
+      
+      input$weibullLoad
+      
+      tempWeibullShape <- isolate(input$weibullShape)
+      tempWeibullScale <- isolate(input$weibullScale)
+      tempWeibullMin <- isolate(input$weibullyMin)
+      tempWeibullMax <- isolate(input$weibullMax)
+      
+      cat("tempWeibullShape ", tempWeibullShape, " \n")
+      cat("tempWeibullScale ", tempWeibullScale, " \n")
+      cat("tempWeibullMin ", tempWeibullMin, " \n")
+      cat("tempWeibullMax ", tempWeibullMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempWeibullMin, tempWeibullMax)), aes(x)) + 
+        stat_function(fun = dweibull, args = list(shape = tempWeibullShape, scale = tempWeibullScale))
+      
+      gg <- ggplotly(tempPlot)
+      
       return ( gg)
     })
     
@@ -337,34 +413,6 @@ shinyObject <- function (title = "Sin nombre"){
       
       return ( gg)
     })
-    
-    
-    output$cauchyGraphic <-renderPlotly({
-      
-      input$cauchyLoad
-      
-      tempCauchyLocation <- isolate(input$cauchyLocation)
-      tempCauchyScale <- isolate(input$cauchyScale)
-      tempCauchyMin <- isolate(input$cauchyMin)
-      tempCauchyMax <- isolate(input$cauchyMax)
-      
-      cat("tempCauchyLocation ", tempCauchyLocation, " \n")
-      cat("tempCauchyScale ", tempCauchyScale, " \n")
-      cat("tempCauchyMin ", tempCauchyMin, " \n")
-      cat("tempCauchyMax ", tempCauchyMax, " \n")
-      
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      
-      tempPlot <- ggplot(data.frame(x = c(tempCauchyMin, tempCauchyMax)), aes(x)) + 
-        stat_function(fun = dcauchy, args = list(location = tempCauchyLocation, scale = tempCauchyScale))
-      
-      gg <- ggplotly(tempPlot)
-      
-      return ( gg)
-    })
-    
     
   }
   
