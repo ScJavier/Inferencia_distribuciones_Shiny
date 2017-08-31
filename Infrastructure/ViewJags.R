@@ -459,7 +459,7 @@ shinyObject <- function (title = "Sin nombre"){
       
       tempWeibullShape <- isolate(input$weibullShape)
       tempWeibullScale <- isolate(input$weibullScale)
-      tempWeibullMin <- isolate(input$weibullyMin)
+      tempWeibullMin <- isolate(input$weibullMin)
       tempWeibullMax <- isolate(input$weibullMax)
       
       cat("tempWeibullShape ", tempWeibullShape, " \n")
