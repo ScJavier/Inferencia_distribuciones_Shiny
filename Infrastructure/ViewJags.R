@@ -15,16 +15,16 @@ shinyObject <- function (title = "Sin nombre"){
       sidebarMenu(
         menuItem("Uniforme", tabName = "uniformeContent", icon = icon("dashboard")),
         menuItem("Exponencial", tabName = "exponencialContent", icon = icon("dashboard")),
-        menuItem("Normal", tabName = "normalContent", icon = icon("dashboard")),
-        menuItem("Gamma", tabName = "gammaContent", icon = icon("dashboard"), selected = TRUE),
+        menuItem("Normal", tabName = "normalContent", icon = icon("dashboard"), selected = TRUE),
+        menuItem("Gamma", tabName = "gammaContent", icon = icon("dashboard")),
         menuItem("Bernoulli", tabName = "bernoulliContent", icon = icon("dashboard")),
         menuItem("Cauchy", tabName = "cauchyContent", icon = icon("dashboard")),
         menuItem("Weibull", tabName = "weibullContent", icon = icon("dashboard")),
         menuItem("Binomial", tabName = "binomialContent", icon = icon("dashboard")),
         menuItem("Poisson", tabName = "poissonContent", icon = icon("dashboard")),
         menuItem("Geométrica", tabName = "geometricaContent", icon = icon("dashboard")),
-        menuItem("Hipergeométrica", tabName = "hipergeometricaContent", icon = icon("dashboard")),
-        menuItem("Binomial Negativa", tabName = "binomailNegativaContent", icon = icon("dashboard"))
+        menuItem("Hipergeométrica", tabName = "hiperContent", icon = icon("dashboard")),
+        menuItem("Binomial Negativa", tabName = "nBinomialContent", icon = icon("dashboard"))
       )
     ),
     dashboardBody(
@@ -65,7 +65,7 @@ shinyObject <- function (title = "Sin nombre"){
                     actionButton("exponencialLoad", "Cargar")
                   ),
                   box(
-                    numericInput("exponencialMin", "Mínimo", -5),
+                    numericInput("exponencialMin", "Mínimo", 0),
                     numericInput("exponencialMax", "Máximo", 5)
                   )
                 ),
@@ -109,7 +109,7 @@ shinyObject <- function (title = "Sin nombre"){
                     actionButton("gammaLoad", "Cargar")
                   ),
                   box(
-                    numericInput("gammaMin", "Mínimo", -5),
+                    numericInput("gammaMin", "Mínimo", 0),
                     numericInput("gammaMax", "Máximo", 5)
                   )
                 ),
@@ -126,12 +126,12 @@ shinyObject <- function (title = "Sin nombre"){
                 ),
                 fluidRow(
                   box(
-                    numericInput("bernoulliProb", "Probabilidad", 1),
+                    numericInput("bernoulliProb", "Probabilidad", 0.5),
                     actionButton("bernoulliLoad", "Cargar")
                   ),
                   box(
                     numericInput("bernoulliMin", "Mínimo", 0),
-                    numericInput("bernoulliMax", "Máximo", 0.5)
+                    numericInput("bernoulliMax", "Máximo", 2)
                   )
                 ),
                 fluidRow(
@@ -176,7 +176,7 @@ shinyObject <- function (title = "Sin nombre"){
                     actionButton("weibullLoad", "Cargar")
                   ),
                   box(
-                    numericInput("weibullMin", "Mínimo", -4),
+                    numericInput("weibullMin", "Mínimo", 0),
                     numericInput("weibullMax", "Máximo", 4)
                   )
                 ),
@@ -200,11 +200,102 @@ shinyObject <- function (title = "Sin nombre"){
                   ),
                   box(
                     numericInput("binomialMin", "Mínimo", 0),
-                    numericInput("binomialMax", "Máximo", 1)
+                    numericInput("binomialMax", "Máximo", 10)
                   )
                 ),
                 fluidRow(
                   plotlyOutput("binomialGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "poissonContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 1, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("poissonLambda", "Media y Varianza", 3),
+                    actionButton("poissonLoad", "Cargar")
+                  ),
+                  box(
+                    numericInput("poissonMin", "Mínimo", 0),
+                    numericInput("poissonMax", "Máximo", 10)
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("poissonGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "geometricaContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 1, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("geometricaProb", "Prob de éxito", 0.3),
+                    actionButton("geometricaLoad", "Cargar")
+                  ),
+                  box(
+                    numericInput("geometricaMin", "Mínimo", 0),
+                    numericInput("geometricaMax", "Máximo", 10)
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("geometricaGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "hiperContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 3, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("hiperM", "m", 10),
+                    numericInput("hiperN", "n", 7),
+                    numericInput("hiperK", "k", 8),
+                    actionButton("hiperLoad", "Cargar")
+                  ),
+                  box(
+                    numericInput("hiperMin", "Mínimo", 0),
+                    numericInput("hiperMax", "Máximo", 100)
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("hiperGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "nBinomialContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("nBinomSize", "Tamaño", 1),
+                    numericInput("nBinomProb", "Probabilidad", 0.5),
+                    actionButton("nBinomLoad", "Cargar")
+                  ),
+                  box(
+                    numericInput("nBinomMin", "Mínimo", 0),
+                    numericInput("nBinomMax", "Máximo", 100)
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("nBinomGraphic")
                 )
         )
       )
@@ -329,7 +420,7 @@ shinyObject <- function (title = "Sin nombre"){
       
       
       tempPlot <- ggplot(data.frame(x = c(tempBernoulliMin, tempBernoulliMax)), aes(x)) + 
-        stat_function(fun = dbinom, geom="point", args = list(size = 1, prob = tempBernoulliProb))
+        stat_function(fun = dbinom,  args = list(size = 1, prob = tempBernoulliProb))
       
       gg <- ggplotly(tempPlot)
       
@@ -408,6 +499,112 @@ shinyObject <- function (title = "Sin nombre"){
       
       tempPlot <- ggplot(data.frame(x = c(tempBinomialMin, tempBinomialMax)), aes(x)) + 
         stat_function(fun = dbinom, args = list(size = tempBinomialSize, prob = tempBinomialProb))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+    
+    output$poissonGraphic <-renderPlotly({
+      
+      input$poissonLoad
+      
+      tempPoissonLambda <- isolate(input$poissonLambda)
+      tempPoissonMin <- isolate(input$poissonMin)
+      tempPoissonMax <- isolate(input$poissonMax)
+      
+      cat("tempPoissonLambda ", tempPoissonLambda, " \n")
+      cat("tempPoissonMin ", tempPoissonMin, " \n")
+      cat("tempPoissonMax ", tempPoissonMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempPoissonMin, tempPoissonMax)), aes(x)) + 
+        stat_function(fun = dpois, args = list(lambda = tempPoissonLambda))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+    
+    output$geometricaGraphic <-renderPlotly({
+      
+      input$geometricaLoad
+      
+      tempGeometricaProb <- isolate(input$geometricaProb)
+      tempGeometricaMin <- isolate(input$geometricaMin)
+      tempGeometricaMax <- isolate(input$geometricaMax)
+      
+      cat("tempGeometricaProb ", tempGeometricaProb, " \n")
+      cat("tempGeometricaMin ", tempGeometricaMin, " \n")
+      cat("tempGeometricaMax ", tempGeometricaMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempGeometricaMin, tempGeometricaMax)), aes(x)) + 
+        stat_function(fun = dgeom, args = list(prob = tempGeometricaProb))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+    
+    output$hiperGraphic <-renderPlotly({
+      
+      input$hiperLoad
+      
+      tempHiperM <- isolate(input$hiperM)
+      tempHiperN <- isolate(input$hiperN)
+      tempHiperK <- isolate(input$hiperK)
+      
+      tempHiperMin <- isolate(input$hiperMin)
+      tempHiperMax <- isolate(input$hiperMax)
+      
+      
+      cat("tempHiperM ", tempHiperM, " \n")
+      cat("tempHiperN ", tempHiperN, " \n")
+      cat("tempHiperK ", tempHiperK, " \n")
+      cat("tempHipeMin ", tempHiperMin, " \n")
+      cat("tempHipeMax ", tempHiperMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempHiperMin, tempHiperMax)), aes(x)) + 
+        stat_function(fun = dhyper, args = list(m = tempHiperM, n = tempHiperN, k = tempHiperK ))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+    
+    output$nBinomGraphic <-renderPlotly({
+      
+      input$nBinomLoad
+      
+      tempNBinomSize <- isolate(input$nBinomSize)
+      tempNBinomProb <- isolate(input$nBinomProb)
+      
+      tempNBinomMin <- isolate(input$nBinomMin)
+      tempNBinomMax <- isolate(input$nBinomMax)
+      
+      
+      cat("tempNBinomSize ", tempNBinomSize, " \n")
+      cat("tempNBinomProb ", tempNBinomProb, " \n")
+      cat("tempNBinomMin ", tempNBinomMin, " \n")
+      cat("tempNBinomMax ", tempNBinomMax, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      
+      tempPlot <- ggplot(data.frame(x = c(tempNBinomMin, tempNBinomMax)), aes(x)) + 
+        stat_function(fun = dnbinom, args = list(size = tempNBinomSize, prob = tempNBinomProb))
       
       gg <- ggplotly(tempPlot)
       
