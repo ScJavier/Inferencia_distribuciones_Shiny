@@ -3,7 +3,7 @@ library(plotly)
 library(ggplot2)
 
 
-shinyServer(input, output, session) {
+shinyServer(function(input, output, session) {
   
   output$uniformeGraphic <-renderPlotly({
     
@@ -312,4 +312,4 @@ shinyServer(input, output, session) {
     return ( gg)
   })
   
-}
+})
