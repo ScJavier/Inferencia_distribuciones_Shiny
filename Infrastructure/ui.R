@@ -261,7 +261,7 @@ shinyUI(dashboardPage( skin = "black",
                              ),
                              box(
                                numericInput("hiperMin", "Mínimo", 0),
-                               numericInput("hiperMax", "Máximo", 100)
+                               numericInput("hiperMax", "Máximo", 10)
                              )
                            ),
                            fluidRow(
@@ -284,7 +284,7 @@ shinyUI(dashboardPage( skin = "black",
                              ),
                              box(
                                numericInput("nBinomMin", "Mínimo", 0),
-                               numericInput("nBinomMax", "Máximo", 100)
+                               numericInput("nBinomMax", "Máximo", 10)
                              )
                            ),
                            fluidRow(
