@@ -1,6 +1,7 @@
 library(shiny)
-library(shinydashboard)
 library(plotly)
+library(shinydashboard)
+library(ggplot2)
 
 shinyUI(dashboardPage( skin = "black",
                dashboardHeader(title = "Probabilidad"),
