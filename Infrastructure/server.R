@@ -5,6 +5,141 @@ library(ggplot2)
 
 shinyServer(function(input, output, session) {
   
+  output$bernoulliGraphic <-renderPlotly({
+    
+    input$bernoulliLoad
+    tempBernoulliProb <- isolate(input$bernoulliProb)
+    cat("tempBernoulliProb ", tempBernoulliProb, " \n")
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    
+    df <- data.frame(x = as.factor(0:1), probs = c(1 - tempBernoulliProb, tempBernoulliProb))
+    tempPlot <- ggplot(df, aes(x, probs)) +
+      geom_col(fill = 'darkcyan', col = 'black') + ylim(0, 1.2*max(df$probs))
+    
+    gg <- ggplotly(tempPlot)
+    
+    return (gg)
+  })
+  
+  output$binomialGraphic <-renderPlotly({
+    
+    input$binomialLoad
+    
+    tempBinomialSize <- isolate(input$binomialSize)
+    tempBinomialProb <- isolate(input$binomialProb)
+    
+    cat("tempBinomialSize ", tempBinomialSize, " \n")
+    cat("tempBinomialProb ", tempBinomialProb, " \n")
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    
+    df <- data.frame(x = as.factor(0:tempBinomialSize),
+                     probs = dbinom(0:tempBinomialSize, tempBinomialSize, tempBinomialProb))
+    tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+      ylim(0, 1.2*max(df$probs))
+    gg <- ggplotly(tempPlot)
+    
+    return (gg)
+  })
+  
+  output$geometricaGraphic <-renderPlotly({
+    
+    input$geometricaLoad
+    tempGeometricaProb <- isolate(input$geometricaProb)
+    cat("tempGeometricaProb ", tempGeometricaProb, " \n")
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    
+    n <- qgeom(0.999, tempGeometricaProb) 
+    df <- data.frame(x = as.factor(0:n), probs = dgeom(0:n, tempGeometricaProb))
+    tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+      ylim(0, 1.2*max(df$probs))
+    
+    gg <- ggplotly(tempPlot)
+    
+    return (gg)
+  })    
+  
+  output$nBinomGraphic <-renderPlotly({
+    
+    input$nBinomLoad
+    
+    tempNBinomSize <- isolate(input$nBinomSize)
+    tempNBinomProb <- isolate(input$nBinomProb)
+    
+    cat("tempNBinomSize ", tempNBinomSize, " \n")
+    cat("tempNBinomProb ", tempNBinomProb, " \n")
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    
+    n <- qnbinom(0.999, tempNBinomSize, tempNBinomProb)
+    df <- data.frame(x = as.factor(0:n), probs = dnbinom(0:n, tempNBinomSize, tempNBinomProb))
+    tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+      ylim(0, 1.2*max(df$probs))
+    
+    gg <- ggplotly(tempPlot)
+    
+    return (gg)
+  })
+  
+  output$poissonGraphic <-renderPlotly({
+    
+    input$poissonLoad
+    tempPoissonLambda <- isolate(input$poissonLambda)
+    
+    cat("tempPoissonLambda ", tempPoissonLambda, " \n")
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    
+    n <- qpois(0.999, tempPoissonLambda)
+    df <- data.frame(x = as.factor(0:n), probs = dpois(0:n, tempPoissonLambda))
+    tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+      ylim(0, 1.2*max(df$probs))
+    
+    gg <- ggplotly(tempPlot)
+    
+    return (gg)
+  })
+  
+  output$hiperGraphic <-renderPlotly({
+    
+    input$hiperLoad
+    
+    tempHiperM <- isolate(input$hiperM)
+    tempHiperN <- isolate(input$hiperN)
+    tempHiperK <- isolate(input$hiperK)
+    
+    cat("tempHiperM ", tempHiperM, " \n")
+    cat("tempHiperN ", tempHiperN, " \n")
+    cat("tempHiperK ", tempHiperK, " \n")
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    
+    updateNumericInput(session, "hiperK", "Número de bolas extraídas",
+                       value = tempHiperK,
+                       min = 1, max = tempHiperM + tempHiperN, step = 1)
+    tempHiperMin <- max(0, tempHiperK - tempHiperN)
+    tempHiperMax <- min(tempHiperK, tempHiperM)
+    df <- data.frame(x = as.factor(tempHiperMin:tempHiperMax),
+                     probs = dhyper(tempHiperMin:tempHiperMax,
+                                    m = tempHiperM,
+                                    n = tempHiperN,
+                                    k = tempHiperK))
+    tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+      ylim(0, 1.2*max(df$probs))
+    
+    gg <- ggplotly(tempPlot)
+    
+    return (gg)
+  })
+  
   output$uniformeGraphic <-renderPlotly({
     
     input$uniformeLoad
@@ -104,30 +239,6 @@ shinyServer(function(input, output, session) {
     return ( gg)
   })
   
-  output$bernoulliGraphic <-renderPlotly({
-    
-    input$bernoulliLoad
-    
-    tempBernoulliProb <- isolate(input$bernoulliProb)
-    tempBernoulliMin <- isolate(input$bernoulliMin)
-    tempBernoulliMax <- isolate(input$bernoulliMax)
-    
-    cat("tempBernoulliProb ", tempBernoulliProb, " \n")
-    cat("tempBernoulliMin ", tempBernoulliMin, " \n")
-    cat("tempBernoulliMax ", tempBernoulliMax, " \n")
-    
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    
-    
-    tempPlot <- ggplot(data.frame(x = c(tempBernoulliMin, tempBernoulliMax)), aes(x)) + 
-      stat_function(fun = dbinom,  args = list(size = 1, prob = tempBernoulliProb))
-    
-    gg <- ggplotly(tempPlot)
-    
-    return (gg)
-  })
-  
   output$cauchyGraphic <-renderPlotly({
     
     input$cauchyLoad
@@ -174,138 +285,6 @@ shinyServer(function(input, output, session) {
     
     tempPlot <- ggplot(data.frame(x = c(tempWeibullMin, tempWeibullMax)), aes(x)) + 
       stat_function(fun = dweibull, args = list(shape = tempWeibullShape, scale = tempWeibullScale))
-    
-    gg <- ggplotly(tempPlot)
-    
-    return ( gg)
-  })
-  
-  output$binomialGraphic <-renderPlotly({
-    
-    input$binomialLoad
-    
-    tempBinomialSize <- isolate(input$binomialSize)
-    tempBinomialProb <- isolate(input$binomialProb)
-    tempBinomialMin <- isolate(input$binomialMin)
-    tempBinomialMax <- isolate(input$binomialMax)
-    
-    cat("tempBinomialSize ", tempBinomialSize, " \n")
-    cat("tempBinomialProb ", tempBinomialProb, " \n")
-    cat("tempBinomialMin ", tempBinomialMin, " \n")
-    cat("tempBinomialMax ", tempBinomialMax, " \n")
-    
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    
-    
-    tempPlot <- ggplot(data.frame(x = c(tempBinomialMin, tempBinomialMax)), aes(x)) + 
-      stat_function(fun = dbinom, args = list(size = tempBinomialSize, prob = tempBinomialProb))
-    
-    gg <- ggplotly(tempPlot)
-    
-    return ( gg)
-  })
-  
-  output$poissonGraphic <-renderPlotly({
-    
-    input$poissonLoad
-    
-    tempPoissonLambda <- isolate(input$poissonLambda)
-    tempPoissonMin <- isolate(input$poissonMin)
-    tempPoissonMax <- isolate(input$poissonMax)
-    
-    cat("tempPoissonLambda ", tempPoissonLambda, " \n")
-    cat("tempPoissonMin ", tempPoissonMin, " \n")
-    cat("tempPoissonMax ", tempPoissonMax, " \n")
-    
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    
-    
-    tempPlot <- ggplot(data.frame(x = c(tempPoissonMin, tempPoissonMax)), aes(x)) + 
-      stat_function(fun = dpois, args = list(lambda = tempPoissonLambda))
-    
-    gg <- ggplotly(tempPlot)
-    
-    return ( gg)
-  })
-  
-  output$geometricaGraphic <-renderPlotly({
-    
-    input$geometricaLoad
-    
-    tempGeometricaProb <- isolate(input$geometricaProb)
-    tempGeometricaMin <- isolate(input$geometricaMin)
-    tempGeometricaMax <- isolate(input$geometricaMax)
-    
-    cat("tempGeometricaProb ", tempGeometricaProb, " \n")
-    cat("tempGeometricaMin ", tempGeometricaMin, " \n")
-    cat("tempGeometricaMax ", tempGeometricaMax, " \n")
-    
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    
-    
-    tempPlot <- ggplot(data.frame(x = c(tempGeometricaMin, tempGeometricaMax)), aes(x)) + 
-      stat_function(fun = dgeom, args = list(prob = tempGeometricaProb))
-    
-    gg <- ggplotly(tempPlot)
-    
-    return ( gg)
-  })
-  
-  output$hiperGraphic <-renderPlotly({
-    
-    input$hiperLoad
-    
-    tempHiperM <- isolate(input$hiperM)
-    tempHiperN <- isolate(input$hiperN)
-    tempHiperK <- isolate(input$hiperK)
-    
-    tempHiperMin <- isolate(input$hiperMin)
-    tempHiperMax <- isolate(input$hiperMax)
-    
-    
-    cat("tempHiperM ", tempHiperM, " \n")
-    cat("tempHiperN ", tempHiperN, " \n")
-    cat("tempHiperK ", tempHiperK, " \n")
-    cat("tempHipeMin ", tempHiperMin, " \n")
-    cat("tempHipeMax ", tempHiperMax, " \n")
-    
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    
-    
-    tempPlot <- ggplot(data.frame(x = c(tempHiperMin, tempHiperMax)), aes(x)) + 
-      stat_function(fun = dhyper, args = list(m = tempHiperM, n = tempHiperN, k = tempHiperK ))
-    
-    gg <- ggplotly(tempPlot)
-    
-    return ( gg)
-  })
-  
-  output$nBinomGraphic <-renderPlotly({
-    
-    input$nBinomLoad
-    
-    tempNBinomSize <- isolate(input$nBinomSize)
-    tempNBinomProb <- isolate(input$nBinomProb)
-    
-    tempNBinomMin <- isolate(input$nBinomMin)
-    tempNBinomMax <- isolate(input$nBinomMax)
-    
-    
-    cat("tempNBinomSize ", tempNBinomSize, " \n")
-    cat("tempNBinomProb ", tempNBinomProb, " \n")
-    cat("tempNBinomMin ", tempNBinomMin, " \n")
-    cat("tempNBinomMax ", tempNBinomMax, " \n")
-    
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    
-    
-    tempPlot <- ggplot(data.frame(x = c(tempNBinomMin, tempNBinomMax)), aes(x)) + 
-      stat_function(fun = dnbinom, args = list(size = tempNBinomSize, prob = tempNBinomProb))
     
     gg <- ggplotly(tempPlot)
     
