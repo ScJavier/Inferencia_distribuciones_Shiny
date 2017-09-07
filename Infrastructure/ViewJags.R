@@ -3,8 +3,6 @@ library(plotly)
 library(shinydashboard)
 library(ggplot2)
 
-
-
 shinyObject <- function (title = "Sin nombre"){
   
   
@@ -112,6 +110,49 @@ shinyObject <- function (title = "Sin nombre"){
                 ),
                 fluidRow(
                   plotlyOutput("nBinomGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "poissonContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 1, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("poissonLambda", "Intensidad", value = 3,
+                                 min = 0.25, step = 0.25)
+                  ),
+                  box(
+                    actionButton("poissonLoad", "Cargar")
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("poissonGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "hiperContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 3, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("hiperM", "Número de bolas blancas", value = 5, min = 1, step = 1),
+                    numericInput("hiperN", "Número de bolas negras", value = 5, min = 1, step = 1)
+                  ),
+                  box(
+                    numericInput("hiperK", "Número de bolas extraídas", value = 3, min = 1, step = 1),
+                    actionButton("hiperLoad", "Cargar")
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("hiperGraphic")
                 )
         ),
         
@@ -251,52 +292,6 @@ shinyObject <- function (title = "Sin nombre"){
                 fluidRow(
                   plotlyOutput("weibullGraphic")
                 )
-        ),
-        
-        tabItem(tabName = "poissonContent", 
-                fluidRow(
-                  # A static infoBox
-                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
-                  # Dynamic infoBoxes
-                  infoBox("# Parámetros", 1, icon = icon("book"), color="orange")
-                ),
-                fluidRow(
-                  box(
-                    numericInput("poissonLambda", "Media y Varianza", 3),
-                    actionButton("poissonLoad", "Cargar")
-                  ),
-                  box(
-                    numericInput("poissonMin", "Mínimo", 0),
-                    numericInput("poissonMax", "Máximo", 10)
-                  )
-                ),
-                fluidRow(
-                  plotlyOutput("poissonGraphic")
-                )
-        ),
-        
-        tabItem(tabName = "hiperContent", 
-                fluidRow(
-                  # A static infoBox
-                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
-                  # Dynamic infoBoxes
-                  infoBox("# Parámetros", 3, icon = icon("book"), color="orange")
-                ),
-                fluidRow(
-                  box(
-                    numericInput("hiperM", "m", 10),
-                    numericInput("hiperN", "n", 7),
-                    numericInput("hiperK", "k", 8),
-                    actionButton("hiperLoad", "Cargar")
-                  ),
-                  box(
-                    numericInput("hiperMin", "Mínimo", 0),
-                    numericInput("hiperMax", "Máximo", 100)
-                  )
-                ),
-                fluidRow(
-                  plotlyOutput("hiperGraphic")
-                )
         )
       )
     )
@@ -341,7 +336,7 @@ shinyObject <- function (title = "Sin nombre"){
         ylim(0, 1.2*max(df$probs))
       gg <- ggplotly(tempPlot)
       
-      return ( gg)
+      return (gg)
     })
     
     output$geometricaGraphic <-renderPlotly({
@@ -360,7 +355,7 @@ shinyObject <- function (title = "Sin nombre"){
 
       gg <- ggplotly(tempPlot)
       
-      return ( gg)
+      return (gg)
     })    
     
     output$nBinomGraphic <-renderPlotly({
@@ -383,9 +378,62 @@ shinyObject <- function (title = "Sin nombre"){
       
       gg <- ggplotly(tempPlot)
       
-      return ( gg)
+      return (gg)
     })
-       
+
+    output$poissonGraphic <-renderPlotly({
+      
+      input$poissonLoad
+      tempPoissonLambda <- isolate(input$poissonLambda)
+
+      cat("tempPoissonLambda ", tempPoissonLambda, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      n <- qpois(0.999, tempPoissonLambda)
+      df <- data.frame(x = as.factor(0:n), probs = dpois(0:n, tempPoissonLambda))
+      tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+        ylim(0, 1.2*max(df$probs))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return (gg)
+    })
+    
+    output$hiperGraphic <-renderPlotly({
+      
+      input$hiperLoad
+      
+      tempHiperM <- isolate(input$hiperM)
+      tempHiperN <- isolate(input$hiperN)
+      tempHiperK <- isolate(input$hiperK)
+    
+      cat("tempHiperM ", tempHiperM, " \n")
+      cat("tempHiperN ", tempHiperN, " \n")
+      cat("tempHiperK ", tempHiperK, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      updateNumericInput(session, "hiperK", "Número de bolas extraídas",
+                         value = tempHiperK,
+                         min = 1, max = tempHiperM + tempHiperN, step = 1)
+      tempHiperMin <- max(0, tempHiperK - tempHiperN)
+      tempHiperMax <- min(tempHiperK, tempHiperM)
+      df <- data.frame(x = as.factor(tempHiperMin:tempHiperMax),
+                       probs = dhyper(tempHiperMin:tempHiperMax,
+                                      m = tempHiperM,
+                                      n = tempHiperN,
+                                      k = tempHiperK))
+      tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+        ylim(0, 1.2*max(df$probs))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return (gg)
+    })
+           
     output$uniformeGraphic <-renderPlotly({
       
       input$uniformeLoad
@@ -537,60 +585,6 @@ shinyObject <- function (title = "Sin nombre"){
       return ( gg)
     })
 
-    output$poissonGraphic <-renderPlotly({
-      
-      input$poissonLoad
-      
-      tempPoissonLambda <- isolate(input$poissonLambda)
-      tempPoissonMin <- isolate(input$poissonMin)
-      tempPoissonMax <- isolate(input$poissonMax)
-      
-      cat("tempPoissonLambda ", tempPoissonLambda, " \n")
-      cat("tempPoissonMin ", tempPoissonMin, " \n")
-      cat("tempPoissonMax ", tempPoissonMax, " \n")
-      
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      
-      tempPlot <- ggplot(data.frame(x = c(tempPoissonMin, tempPoissonMax)), aes(x)) + 
-        stat_function(fun = dpois, args = list(lambda = tempPoissonLambda))
-      
-      gg <- ggplotly(tempPlot)
-      
-      return ( gg)
-    })
-    
-    output$hiperGraphic <-renderPlotly({
-      
-      input$hiperLoad
-      
-      tempHiperM <- isolate(input$hiperM)
-      tempHiperN <- isolate(input$hiperN)
-      tempHiperK <- isolate(input$hiperK)
-      
-      tempHiperMin <- isolate(input$hiperMin)
-      tempHiperMax <- isolate(input$hiperMax)
-      
-      
-      cat("tempHiperM ", tempHiperM, " \n")
-      cat("tempHiperN ", tempHiperN, " \n")
-      cat("tempHiperK ", tempHiperK, " \n")
-      cat("tempHipeMin ", tempHiperMin, " \n")
-      cat("tempHipeMax ", tempHiperMax, " \n")
-      
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      
-      tempPlot <- ggplot(data.frame(x = c(tempHiperMin, tempHiperMax)), aes(x)) + 
-        stat_function(fun = dhyper, args = list(m = tempHiperM, n = tempHiperN, k = tempHiperK ))
-      
-      gg <- ggplotly(tempPlot)
-      
-      return ( gg)
-    })
-    
   }
   
   return (shinyObject);
