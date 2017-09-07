@@ -39,7 +39,7 @@ shinyObject <- function (title = "Sin nombre"){
                 fluidRow(
                   box(
                     numericInput("bernoulliProb", "Probabilidad", value = 0.5,
-                                 min = 0, max = 1, step = 0.05)
+                                 min = 0.05, max = 0.95, step = 0.05)
                   ),
                   box(
                     actionButton("bernoulliLoad", "Cargar")
@@ -47,6 +47,71 @@ shinyObject <- function (title = "Sin nombre"){
                 ),
                 fluidRow(
                   plotlyOutput("bernoulliGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "binomialContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("binomialSize", "Tamaño", value = 5, min = 1, step = 1),
+                    actionButton("binomialLoad", "Cargar")
+                  ),
+                  box(
+                    numericInput("binomialProb", "Probabilidad", value = 0.5,
+                                 min = 0.05, max = 0.95, step = 0.05)
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("binomialGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "geometricaContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 1, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("geometricaProb", "Prob de éxito", value = 0.5,
+                                 min = 0.05, max = 0.95, step = 0.05)
+                  ),
+                  box(
+                    actionButton("geometricaLoad", "Cargar")
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("geometricaGraphic")
+                )
+        ),
+        
+        tabItem(tabName = "nBinomialContent", 
+                fluidRow(
+                  # A static infoBox
+                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
+                  # Dynamic infoBoxes
+                  infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
+                ),
+                fluidRow(
+                  box(
+                    numericInput("nBinomSize", "Tamaño", value = 1, min = 1, step = 1)
+                  ),
+                  box(
+                    numericInput("nBinomProb", "Probabilidad", value = 0.5,
+                                 min = 0.05, max = 0.95, step = 0.05),
+                    actionButton("nBinomLoad", "Cargar")
+                  )
+                ),
+                fluidRow(
+                  plotlyOutput("nBinomGraphic")
                 )
         ),
         
@@ -188,28 +253,6 @@ shinyObject <- function (title = "Sin nombre"){
                 )
         ),
         
-        tabItem(tabName = "binomialContent", 
-                fluidRow(
-                  # A static infoBox
-                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
-                  # Dynamic infoBoxes
-                  infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
-                ),
-                fluidRow(
-                  box(
-                    numericInput("binomialSize", "Tamaño", value = 5, min = 1, step = 1),
-                    actionButton("binomialLoad", "Cargar")
-                  ),
-                  box(
-                    numericInput("binomialProb", "Probabilidad", value = 0.5,
-                                 min = 0, max = 1, step = 0.05)
-                  )
-                ),
-                fluidRow(
-                  plotlyOutput("binomialGraphic")
-                )
-        ),
-        
         tabItem(tabName = "poissonContent", 
                 fluidRow(
                   # A static infoBox
@@ -229,28 +272,6 @@ shinyObject <- function (title = "Sin nombre"){
                 ),
                 fluidRow(
                   plotlyOutput("poissonGraphic")
-                )
-        ),
-        
-        tabItem(tabName = "geometricaContent", 
-                fluidRow(
-                  # A static infoBox
-                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
-                  # Dynamic infoBoxes
-                  infoBox("# Parámetros", 1, icon = icon("book"), color="orange")
-                ),
-                fluidRow(
-                  box(
-                    numericInput("geometricaProb", "Prob de éxito", 0.3),
-                    actionButton("geometricaLoad", "Cargar")
-                  ),
-                  box(
-                    numericInput("geometricaMin", "Mínimo", 0),
-                    numericInput("geometricaMax", "Máximo", 10)
-                  )
-                ),
-                fluidRow(
-                  plotlyOutput("geometricaGraphic")
                 )
         ),
         
@@ -276,29 +297,6 @@ shinyObject <- function (title = "Sin nombre"){
                 fluidRow(
                   plotlyOutput("hiperGraphic")
                 )
-        ),
-        
-        tabItem(tabName = "nBinomialContent", 
-                fluidRow(
-                  # A static infoBox
-                  infoBox("Tipo", "Discreta", icon = icon("chain"), color="purple"),
-                  # Dynamic infoBoxes
-                  infoBox("# Parámetros", 2, icon = icon("book"), color="orange")
-                ),
-                fluidRow(
-                  box(
-                    numericInput("nBinomSize", "Tamaño", 1),
-                    numericInput("nBinomProb", "Probabilidad", 0.5),
-                    actionButton("nBinomLoad", "Cargar")
-                  ),
-                  box(
-                    numericInput("nBinomMin", "Mínimo", 0),
-                    numericInput("nBinomMax", "Máximo", 100)
-                  )
-                ),
-                fluidRow(
-                  plotlyOutput("nBinomGraphic")
-                )
         )
       )
     )
@@ -306,6 +304,88 @@ shinyObject <- function (title = "Sin nombre"){
   
   shinyObject$server <- function(input, output, session) {
     
+    output$bernoulliGraphic <-renderPlotly({
+      
+      input$bernoulliLoad
+      tempBernoulliProb <- isolate(input$bernoulliProb)
+      cat("tempBernoulliProb ", tempBernoulliProb, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      df <- data.frame(x = as.factor(0:1), probs = c(1 - tempBernoulliProb, tempBernoulliProb))
+      tempPlot <- ggplot(df, aes(x, probs)) +
+        geom_col(fill = 'darkcyan', col = 'black') + ylim(0, 1.2*max(df$probs))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return (gg)
+    })
+ 
+    output$binomialGraphic <-renderPlotly({
+      
+      input$binomialLoad
+      
+      tempBinomialSize <- isolate(input$binomialSize)
+      tempBinomialProb <- isolate(input$binomialProb)
+      
+      cat("tempBinomialSize ", tempBinomialSize, " \n")
+      cat("tempBinomialProb ", tempBinomialProb, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      df <- data.frame(x = as.factor(0:tempBinomialSize),
+                       probs = dbinom(0:tempBinomialSize, tempBinomialSize, tempBinomialProb))
+      tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+        ylim(0, 1.2*max(df$probs))
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+    
+    output$geometricaGraphic <-renderPlotly({
+      
+      input$geometricaLoad
+      tempGeometricaProb <- isolate(input$geometricaProb)
+      cat("tempGeometricaProb ", tempGeometricaProb, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      n <- qgeom(0.999, tempGeometricaProb) 
+      df <- data.frame(x = as.factor(0:n), probs = dgeom(0:n, tempGeometricaProb))
+      tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+        ylim(0, 1.2*max(df$probs))
+
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })    
+    
+    output$nBinomGraphic <-renderPlotly({
+      
+      input$nBinomLoad
+      
+      tempNBinomSize <- isolate(input$nBinomSize)
+      tempNBinomProb <- isolate(input$nBinomProb)
+      
+      cat("tempNBinomSize ", tempNBinomSize, " \n")
+      cat("tempNBinomProb ", tempNBinomProb, " \n")
+      
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      
+      n <- qnbinom(0.999, tempNBinomSize, tempNBinomProb)
+      df <- data.frame(x = as.factor(0:n), probs = dnbinom(0:n, tempNBinomSize, tempNBinomProb))
+      tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
+        ylim(0, 1.2*max(df$probs))
+      
+      gg <- ggplotly(tempPlot)
+      
+      return ( gg)
+    })
+       
     output$uniformeGraphic <-renderPlotly({
       
       input$uniformeLoad
@@ -405,24 +485,6 @@ shinyObject <- function (title = "Sin nombre"){
       return ( gg)
     })
     
-    output$bernoulliGraphic <-renderPlotly({
-      
-      input$bernoulliLoad
-      tempBernoulliProb <- isolate(input$bernoulliProb)
-      cat("tempBernoulliProb ", tempBernoulliProb, " \n")
-
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      df <- data.frame(x = as.factor(0:1), probs = c(1 - tempBernoulliProb, tempBernoulliProb))
-      tempPlot <- ggplot(df, aes(x, probs)) +
-        geom_col(fill = 'darkcyan', col = 'black') + ylim(0, 1.2*max(df$probs))
-      
-      gg <- ggplotly(tempPlot)
-      
-      return (gg)
-    })
-    
     output$cauchyGraphic <-renderPlotly({
       
       input$cauchyLoad
@@ -474,29 +536,7 @@ shinyObject <- function (title = "Sin nombre"){
       
       return ( gg)
     })
-    
-    output$binomialGraphic <-renderPlotly({
-      
-      input$binomialLoad
-      
-      tempBinomialSize <- isolate(input$binomialSize)
-      tempBinomialProb <- isolate(input$binomialProb)
-      
-      cat("tempBinomialSize ", tempBinomialSize, " \n")
-      cat("tempBinomialProb ", tempBinomialProb, " \n")
 
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      df <- data.frame(x = as.factor(0:tempBinomialSize),
-                       probs = dbinom(0:tempBinomialSize, tempBinomialSize, tempBinomialProb))
-      tempPlot <- ggplot(df, aes(x, probs)) + geom_col(fill = 'darkcyan', col = 'black') +
-                    ylim(0, 1.2*max(df$probs))
-      gg <- ggplotly(tempPlot)
-      
-      return ( gg)
-    })
-    
     output$poissonGraphic <-renderPlotly({
       
       input$poissonLoad
@@ -515,30 +555,6 @@ shinyObject <- function (title = "Sin nombre"){
       
       tempPlot <- ggplot(data.frame(x = c(tempPoissonMin, tempPoissonMax)), aes(x)) + 
         stat_function(fun = dpois, args = list(lambda = tempPoissonLambda))
-      
-      gg <- ggplotly(tempPlot)
-      
-      return ( gg)
-    })
-    
-    output$geometricaGraphic <-renderPlotly({
-      
-      input$geometricaLoad
-      
-      tempGeometricaProb <- isolate(input$geometricaProb)
-      tempGeometricaMin <- isolate(input$geometricaMin)
-      tempGeometricaMax <- isolate(input$geometricaMax)
-      
-      cat("tempGeometricaProb ", tempGeometricaProb, " \n")
-      cat("tempGeometricaMin ", tempGeometricaMin, " \n")
-      cat("tempGeometricaMax ", tempGeometricaMax, " \n")
-      
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      
-      tempPlot <- ggplot(data.frame(x = c(tempGeometricaMin, tempGeometricaMax)), aes(x)) + 
-        stat_function(fun = dgeom, args = list(prob = tempGeometricaProb))
       
       gg <- ggplotly(tempPlot)
       
@@ -569,34 +585,6 @@ shinyObject <- function (title = "Sin nombre"){
       
       tempPlot <- ggplot(data.frame(x = c(tempHiperMin, tempHiperMax)), aes(x)) + 
         stat_function(fun = dhyper, args = list(m = tempHiperM, n = tempHiperN, k = tempHiperK ))
-      
-      gg <- ggplotly(tempPlot)
-      
-      return ( gg)
-    })
-    
-    output$nBinomGraphic <-renderPlotly({
-      
-      input$nBinomLoad
-      
-      tempNBinomSize <- isolate(input$nBinomSize)
-      tempNBinomProb <- isolate(input$nBinomProb)
-      
-      tempNBinomMin <- isolate(input$nBinomMin)
-      tempNBinomMax <- isolate(input$nBinomMax)
-      
-      
-      cat("tempNBinomSize ", tempNBinomSize, " \n")
-      cat("tempNBinomProb ", tempNBinomProb, " \n")
-      cat("tempNBinomMin ", tempNBinomMin, " \n")
-      cat("tempNBinomMax ", tempNBinomMax, " \n")
-      
-      progress <- shiny::Progress$new()
-      on.exit(progress$close())
-      
-      
-      tempPlot <- ggplot(data.frame(x = c(tempNBinomMin, tempNBinomMax)), aes(x)) + 
-        stat_function(fun = dnbinom, args = list(size = tempNBinomSize, prob = tempNBinomProb))
       
       gg <- ggplotly(tempPlot)
       
